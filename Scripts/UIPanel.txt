@@ -58,3 +58,7 @@
             RefreshAllNGUIPanelFlag = false;
         }
     }
+	void LateUpdate ()
+	{
+        RefreshAllNGUIPanel();
+    }
