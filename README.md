@@ -1,2 +1,3 @@
 # NGUI_DynamicFont_Bug_Fix
  NGUI_DynamicFont_Bug_Fix
+这里修正了NGUI使用动态字体时文字破碎得Bug

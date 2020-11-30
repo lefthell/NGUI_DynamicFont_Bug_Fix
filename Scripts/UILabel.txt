@@ -1,0 +1,120 @@
+    public static bool FontChangedFlag { get; set; }
+	public static void OnFontChanged (Font font)
+	{
+        ++mFontChangedDepth;
+        FontChangedFlag = true;
+        if (mFontChangedDepth == 1)
+        {
+            for (int i = 0; i < mList.size; ++i)
+            {
+                UILabel lbl = mList.buffer[i];
+
+                if (lbl != null)
+                {
+                    Font fnt = lbl.trueTypeFont;
+
+                    if (fnt == font)
+                    {
+                        fnt.RequestCharactersInTexture(lbl.mText, lbl.mFinalFontSize, lbl.mFontStyle);
+                        lbl.MarkAsChanged();
+                        lbl.SetMaterixFrame(-1);
+                    }
+                }
+            }
+            UILabel label = NGUIText.UpdateOnFontChangeUILabel;
+            if (!UIPanel.RefreshAllNGUIPanelFlag)
+            {
+                FontChangedFlag = false;
+                if (UIPanel.UpdateFrameEnd == Time.frameCount)
+                {
+                    UIPanel.SetUpdateFrame(-1);
+                    UIPanel.RefreshAllNGUIPanel();
+                }
+            }
+            else
+            {
+
+            }
+            if (label != null)
+            {
+                label.UpdateNGUIText();
+            }
+        }
+       
+        --mFontChangedDepth;
+    }
+	
+	public void UpdateNGUIText ()
+	{
+		NGUIText.fontSize = mFinalFontSize;
+		NGUIText.fontStyle = mFontStyle;
+		NGUIText.rectWidth = mWidth;
+		NGUIText.rectHeight = mHeight;
+		NGUIText.regionWidth = Mathf.RoundToInt(mWidth * (mDrawRegion.z - mDrawRegion.x));
+		NGUIText.regionHeight = Mathf.RoundToInt(mHeight * (mDrawRegion.w - mDrawRegion.y));
+		NGUIText.gradient = mApplyGradient && !packedFontShader;
+		NGUIText.gradientTop = mGradientTop;
+		NGUIText.gradientBottom = mGradientBottom;
+		NGUIText.encoding = mEncoding;
+		NGUIText.premultiply = mPremultiply;
+		NGUIText.symbolStyle = mSymbols;
+		NGUIText.maxLines = mMaxLineCount;
+		NGUIText.spacingX = effectiveSpacingX;
+		NGUIText.spacingY = effectiveSpacingY;
+		NGUIText.spaceWidth = 0;
+
+		var font = this.font;
+		if (font != null) NGUIText.spaceWidth = font.spaceWidth;
+
+		var ttf = trueTypeFont;
+		var isDynamic = (ttf != null);
+
+		if (isDynamic)
+		{
+			NGUIText.fontScale = mScale;
+		}
+		else if (font != null)
+		{
+			font = font.finalFont;
+			NGUIText.fontScale = (font != null) ? ((float)mFontSize / font.defaultSize) * mScale : mScale;
+		}
+		else NGUIText.fontScale = mScale;
+
+		NGUIText.nguiFont = font;
+		NGUIText.dynamicFont = ttf;
+
+		if (isDynamic && keepCrisp)
+		{
+			UIRoot rt = root;
+			if (rt != null) NGUIText.pixelDensity = (rt != null) ? rt.pixelSizeAdjustment : 1f;
+		}
+		else NGUIText.pixelDensity = 1f;
+
+		if (mDensity != NGUIText.pixelDensity)
+		{
+			ProcessText(false, false);
+			NGUIText.rectWidth = mWidth;
+			NGUIText.rectHeight = mHeight;
+			NGUIText.regionWidth = Mathf.RoundToInt(mWidth * (mDrawRegion.z - mDrawRegion.x));
+			NGUIText.regionHeight = Mathf.RoundToInt(mHeight * (mDrawRegion.w - mDrawRegion.y));
+		}
+
+		if (alignment == Alignment.Automatic)
+		{
+			Pivot p = pivot;
+
+			if (p == Pivot.Left || p == Pivot.TopLeft || p == Pivot.BottomLeft)
+			{
+				NGUIText.alignment = Alignment.Left;
+			}
+			else if (p == Pivot.Right || p == Pivot.TopRight || p == Pivot.BottomRight)
+			{
+				NGUIText.alignment = Alignment.Right;
+			}
+			else NGUIText.alignment = Alignment.Center;
+		}
+		else NGUIText.alignment = alignment;
+        NGUIText.UpdateOnFontChangeUILabel = this;
+        NGUIText.Update();
+        NGUIText.UpdateOnFontChangeUILabel = null;
+    }
