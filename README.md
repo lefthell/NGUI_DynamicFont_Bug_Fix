@@ -1,0 +1,2 @@
+# NGUI_DynamicFont_Bug_Fix
+ NGUI_DynamicFont_Bug_Fix
