@@ -118,3 +118,7 @@
         NGUIText.Update();
         NGUIText.UpdateOnFontChangeUILabel = null;
     }
+    public void SetMaterixFrame(int matrixFrame)
+    {
+        mMatrixFrame = matrixFrame;
+    }
