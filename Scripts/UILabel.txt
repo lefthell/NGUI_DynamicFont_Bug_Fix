@@ -1,10 +1,12 @@
     public static bool FontChangedFlag { get; set; }
+	public readonly static HashSet<Font> HashFont = new HashSet<Font>();
 	public static void OnFontChanged (Font font)
 	{
         ++mFontChangedDepth;
         FontChangedFlag = true;
-        if (mFontChangedDepth == 1)
+        if (mFontChangedDepth == 1||!HashFont.Contains(font))
         {
+			HashFont.Add(font);
             for (int i = 0; i < mList.size; ++i)
             {
                 UILabel lbl = mList.buffer[i];
@@ -21,6 +23,7 @@
                     }
                 }
             }
+			HashFont.Remove(font);
             UILabel label = NGUIText.UpdateOnFontChangeUILabel;
             if (!UIPanel.RefreshAllNGUIPanelFlag)
             {
